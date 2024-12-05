@@ -1,0 +1,25 @@
+{
+  "name": "kanbanboard",
+  "version": "1.0.0",
+  "description": "board of kans",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node backend.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Bonerweed/kanbanboard.git"
+  },
+  "author": "Vesa \"Bonerweed\" Koski",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Bonerweed/kanbanboard/issues"
+  },
+  "homepage": "https://github.com/Bonerweed/kanbanboard#readme",
+  "dependencies": {
+    "express": "^4.21.1",
+    "mongoose": "^8.8.3",
+    "pug": "^3.0.3"
+  }
+}
