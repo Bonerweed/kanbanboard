@@ -18,8 +18,13 @@
   },
   "homepage": "https://github.com/Bonerweed/kanbanboard#readme",
   "dependencies": {
+    "body-parser": "^1.20.3",
+    "cookie-parser": "^1.4.7",
     "express": "^4.21.1",
+    "express-session": "^1.18.1",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.8.3",
+    "multer": "^1.4.5-lts.1",
     "pug": "^3.0.3"
   }
 }

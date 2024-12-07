@@ -1,0 +1,16 @@
+extends layout
+
+block content
+  h1(class = "centered") Your Kans
+  button(id= "create-new" class = "btn waves-effect waves-dark") Create New
+  table( class = "centered highlight s8 push-s2")
+    tr(id = "board-list")
+      th #
+      th Title
+    each board in boards
+      tr
+        td= board["title"]
+        td
+          button(id= "index" class = "btn waves-effect waves-dark" value= board["title"]  onclick= "showThread(this.value)" ) View
+          button(id= "index" class = "btn waves-effect waves-dark" value= board["title"]  onclick= "nukeThread(this.value)" ) Nuke
+  script(src= "/js/kanview.js")

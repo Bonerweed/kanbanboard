@@ -1,0 +1,16 @@
+extends layout
+
+block content
+    head
+        title= title
+    body
+        div(class="mustardcol container row")
+            form(id="loginpage" class="col s2 push-s5 pull-s5" action="login")
+                label(for= "username") Username
+                input(type= "text" name= "username" id= "username" required)
+                label(for= "password") Password
+                input(type= "password" name= "password1" id= "password1" required)
+                label(for= "password2") Re-enter Password
+                input(type= "password" name= "password2" id= "password2" required)
+                button(class= "btn" type= "submit") Register
+            script(src= "/js/register.js")
