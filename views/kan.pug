@@ -13,15 +13,15 @@ block content
                     label(id="contentLabel" for="toolContent") Content
                     button(id="contentBtn" class="" onclick="invokeContent()") Change Content
                     button(id="delete" class="hide" onclick="deleteItem()") Delete
-                div(id="colorBox" class="col s2 hide")
-                    button(id="white" class="btn-small white black-text" value="white" onclick="addColor(this.value)") White
-                    button(id="green" class="btn-small green" value="green" onclick="addColor(this.value)") Green
-                    button(id="yellow" class="btn-small yellow black-text" value="yellow" onclick="addColor(this.value)") Yellow
-                    button(id="red" class="btn-small red" value="red" onclick="addColor(this.value)") Red
+                div(id="colorBox" class="hide")
+                    button(id="white" class="btn-small white black-text" value="white" onclick="addColor(this.value)") Pending
+                    button(id="green" class="btn-small green" value="green" onclick="addColor(this.value)") Done
+                    button(id="yellow" class="btn-small yellow black-text" value="yellow" onclick="addColor(this.value)") In Progress
+                    button(id="red" class="btn-small red" value="red" onclick="addColor(this.value)") Critical
                 div(id="generalTools")
                     button(id="newTicket" class="btn-flat" onClick="newTicket()" class="hide") New Ticket
                     button(id="newLane" class="btn-flat" onClick="newLane()") New Lane
-                div(id="moveTools" class="hide")
+                div(id="moveTools" class=" hide")
                     button(id="moveleft" value="right" class="btn-flat" onClick="moveLR(this.value)" ) Move Right
                     button(id="moveright" value="left" class="btn-flat" onClick="moveLR(this.value)") Move Left
                     button(id="moveup" value="up" class="btn-flat" onClick="moveUD(this.value)") Move Up
