@@ -182,7 +182,78 @@ function addColor(color){
         console.log(_dbTarget);
     }
 }
+//move ticket left/right
+function moveLR(direction) {
+    console.log(_target, _target.parentNode);
+    const moves = {
+        right: undefined,
+        left: undefined
+    }
+    const origParent = _target.parentNode;
+    const currentlanes = document.querySelectorAll("div.lane");
+    console.log(origParent, currentlanes);
+    //get left right moves
+    for (let i = 0; i < currentlanes.length; i++) {
+        console.log(currentlanes[i].id == origParent.id, currentlanes[i].id, origParent.id);
+        if (currentlanes[i].id == origParent.id) {
+            if ( i - 1 > -1) {
+                moves.left = currentlanes[i-1];
+            }
+            if (i + 1 < currentlanes.length) {
+                moves.right = currentlanes[i+1];
+            }
+            console.log(moves);
+            break;
+        }
+    }
+    let fragment = document.createDocumentFragment();
+    if (direction == "left" && typeof moves.left != "undefined") {
+        fragment.appendChild(_target);
+        moves.left.appendChild(fragment);
+    }
+    else if (direction == "right" && typeof moves.right != "undefined") {
+        fragment.appendChild(_target);
+        moves.right.appendChild(fragment);
+    }
+    deselect();
+}
 
+//move ticket up/down
+function moveUD(direction) {
+    console.log(_target, _target.parentNode);
+    const moves = {
+        up: undefined,
+        down: undefined,
+    }
+    const origParent = _target.parentNode;
+    
+    //get up down moves
+    const ticdren = origParent.getElementsByTagName("div");
+    console.log(ticdren);
+    for (let j= 0; j < ticdren.length;j++) {
+        console.log(ticdren[j].id == _target.id, ticdren[j].id, _target.id);
+        if (ticdren[j].id == _target.id) {
+            if (j-1 > -1) {
+                moves.up = ticdren[j-1];
+            }
+            if (j+1 < ticdren.length) {
+                moves.down = ticdren[j+1];
+            }
+            console.log(moves);
+            break;
+        }
+    }
+    if (direction == "up" && typeof moves.up != "undefined") {
+        console.log("MOVING UP");
+        origParent.insertBefore(_target, moves.up);
+    }
+    else if (direction == "down" && typeof moves.down != "undefined") {
+        console.log("MOVING DOWN");
+        origParent.insertBefore(moves.down, _target);
+
+    }
+    deselect();
+}
 
 //create new lane
 function newLane() {
@@ -190,7 +261,7 @@ function newLane() {
     const div = document.createElement("div");
     div.id = "NEW_LANE_"+_newDivamount.toString();
     div.title = "NEW_LANE_"+_newDivamount.toString();
-    div.classList = "mustardcol col s1 rowlette";
+    div.classList = "mustardcol col lane s1 rowlette";
     div.innerHTML = "<h9 id=\"title\">NEW LANE</h9>"
     document.getElementById("content-stuff").appendChild(div);
     div.addEventListener("pointerdown", () => {
@@ -283,6 +354,9 @@ function hideTicketTools() {
     if (document.getElementById("generalTools").classList.contains("hide")) {
         document.getElementById("generalTools").classList.remove("hide");
     }
+    if (!document.getElementById("moveTools").classList.contains("hide")) {
+        document.getElementById("moveTools").classList.add("hide");
+    }
     const ticketStuff = [
         document.getElementById("toolContent"),
         document.getElementById("contentBtn"),
@@ -301,6 +375,9 @@ function hideTicketTools() {
 function showTicketTools() {
     if (!document.getElementById("generalTools").classList.contains("hide")) {
         document.getElementById("generalTools").classList.add("hide");
+    }
+    if (document.getElementById("moveTools").classList.contains("hide")) {
+        document.getElementById("moveTools").classList.remove("hide");
     }
     const ticketStuff = [
         document.getElementById("toolContent"),

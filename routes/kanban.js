@@ -73,6 +73,8 @@ router.post("/list", async (req, res) => {
     });
     res.json({success: true, redirect:"/kanban/list"});
 });
+
+
 //POST list to delete
 router.post("/:boardId/delete", async (req, res)=>{
     //console.log("nuking", req.params.boardId);
@@ -100,40 +102,30 @@ router.post("/:boardId/delete", async (req, res)=>{
     res.json({success: true, redirect:"/kanban/list"});
 });
 
-
-async function deepRemove(lane) {
-    const ticketList = lane.tickets;
-    for (let i = 0; i < ticketList.length; i++) {
-        const tictodelete = await Ticket.findOne({_id: ticketList[i]});
-        //console.log(tictodelete);
-        tictodelete.deleteOne();
-        const thing = await Ticket.findOneAndDelete({_id: ticketList[i]});
-        //console.log("daletion comnplete?", thing);
-    }
-}
-
 async function checkDeadLanes(queryLanes, lanes) {
+    console.log(queryLanes.length, lanes.length);
+    let orphans = [];
     for (let p = 0; p < queryLanes.length; p++) {
         //check for deleted lanes
         //pre existing lane
+        console.log("LOOP", p);
         let stillImportant = false;
         for (let g = 0; g < lanes.length; g++) {
-            //console.log("WHEE", lanes[g].id, queryLanes[p].id);
+            console.log("WHEE", lanes[g].id, queryLanes[p].id);
             if (lanes[g].id == queryLanes[p].id) {
-                //console.log("WHEE");
+                console.log("WHEEAR");
                 stillImportant = true;
-                break;
             }
         }
         if (!stillImportant) {
-            await deepRemove(queryLanes[p]);
+            console.log("NORTIMPORTNAT");
+            orphans = orphans.concat(queryLanes[p].tickets);
             const lanetodelete = await Lane.findOne({_id: queryLanes[p]});
-            //console.log(lanetodelete);
             lanetodelete.deleteOne();
             const thing = await Lane.findOneAndDelete({_id: queryLanes[p]});
-            //console.log("daletion comnplete?", thing);
         }
     }
+    return orphans;
 }
 
 //get save post, what a horrible amalgamation
@@ -141,11 +133,17 @@ router.post("/view/:boardId/save", async (req, res) => {
     if (!req.session.user) {
         res.redirect("/user/login");
     }
+    let orphanCollector = [];
+    let survivorCollector = [];
     const _board = await Board.findOne({_id: req.params.boardId});
     const queryLanes = await Lane.find({boardId: req.params.boardId}).exec();
     //console.log("SAVE REQ", req.params, req.body, _board);
     const lanes = req.body.lanes;
-    await checkDeadLanes(queryLanes, lanes);
+    const potentialOrphans = await checkDeadLanes(queryLanes, lanes);
+    if (potentialOrphans.length > 0) {
+        console.log("WE GOT ORPHANS");
+        orphanCollector = orphanCollector.concat(potentialOrphans);
+    }
     for (let i = 0; i < lanes.length; i++) {
         //console.log(lanes[i].tickets);
         const ticListUpd = [];
@@ -158,14 +156,11 @@ router.post("/view/:boardId/save", async (req, res) => {
                     text: tic.content,
                     color: tic.color
                 };
-                //console.log("UPD", ticupdate);
                 const ticup = await Ticket.findOne({_id: tic.id});
-                //console.log("TICUP", ticup);
                 ticup.title = tic.title;
                 ticup.text = tic.content;
                 ticup.color = tic.color;
                 ticup.save();
-                //console.log("POST TIC", ticup);
                 ticListUpd.push(ticup.id);
             }
             else {
@@ -196,38 +191,59 @@ router.post("/view/:boardId/save", async (req, res) => {
         else {
             laneup = await Lane.findOne({_id: lanes[i].id});
         }
-        //console.log("LANEUP", laneup);
         const OldTickets = laneup.tickets;
         laneup.tickets = ticListUpd;
         laneup.save();
-        //console.log("LANEUP AFTER", laneup);
+        survivorCollector = survivorCollector.concat(ticListUpd);
         for (let h = 0; h < OldTickets.length; h++) {
             let included = false;
             for (let k = 0; k < ticListUpd.length; k++) {
-                //console.log(OldTickets[h], ticListUpd[k], OldTickets[h].id, ticListUpd[k].id);
                 if (OldTickets[h] == ticListUpd[k]) {
-                    //console.log("FOUND IN BOTH");
                     included = true;
                     break;
                 }
             }
             if (!included) {
-                //console.log("DELETE", OldTickets[h]);
-                //Lane.deleteOne();
-                const tictodelete = await Ticket.findOne({_id: OldTickets[h]});
-                //console.log(tictodelete);
-                tictodelete.deleteOne();
-                const thing = await Ticket.findOneAndDelete({_id: OldTickets[h]});
-                //console.log("daletion comnplete?", thing);
+                console.log("ARGH");
+                orphanCollector.push(OldTickets[h]);
+                //const tictodelete = await Ticket.findOne({_id: OldTickets[h]});
+                //tictodelete.deleteOne();
+                //const thing = await Ticket.findOneAndDelete({_id: OldTickets[h]});
             }
         }
         
     }
-    res.json({success: true, redirect: `/kanban/view/${req.params.boardId}`})
+    await orphanCrusher(orphanCollector, survivorCollector, req.session.user);
+    res.json({success: true, redirect: `/kanban/view/${req.params.boardId}`});
 });
 
+async function orphanCrusher(orphans, survivors, user) {
+    /*const remainingLanes = await Lane.find({owner: user}).exec();
+    console.log(remainingLanes);
+    let survivors = [];
+    for (let i = 0; i < remainingLanes.length; i++) {
+        survivors = survivors.concat(remainingLanes[i].tickets);
+    }
+    console.log(survivors, orphans);*/
+    const trueOrphans = orphans.filter(orphan => !survivors.includes(orphan));
+    console.log(trueOrphans, orphans, survivors);
+    for (let i = 0; i < trueOrphans.length; i++) {
+        const tictodelete = await Ticket.findOne({_id: trueOrphans[i]});
+        tictodelete.deleteOne();
+        const thing = await Ticket.findOneAndDelete({_id: trueOrphans[i]});
+    }
+}
 
-
+/*async function deepRemove(lane, user) {
+    const ticketList = lane.tickets;
+    for (let i = 0; i < ticketList.length; i++) {
+        const tictodelete = await Ticket.findOne({_id: ticketList[i]});
+        //console.log(tictodelete);
+        //tictodelete.deleteOne();
+        //const thing = await Ticket.findOneAndDelete({_id: ticketList[i]});
+        //console.log("daletion comnplete?", thing);
+    }
+}*/
 //GET show kan
 /*router.get("/:kanid", (req, res) => {
     if (req.session.user) {
