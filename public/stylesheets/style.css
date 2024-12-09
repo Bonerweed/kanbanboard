@@ -1,9 +1,23 @@
 .row {
-    height: 100vh;
-    margin-bottom: 0;
-  }
+  height: 100vh;
+  margin-bottom: 0;
+}
 
 .mustardcol {
   height: 100vh;
   margin-bottom: 0;
+}
+
+.hidden {
+  height: 0px;
+}
+
+.rowlette {
+  border:5px solid #AAAAAA;  
+  margin-top:10px; 
+}
+
+.ticlette {
+  border:1px solid #333333;  
+  margin-top:10px;
 }

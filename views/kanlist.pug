@@ -1,16 +1,20 @@
 extends layout
 
 block content
-  h1(class = "centered") Your Kans
-  button(id= "create-new" class = "btn waves-effect waves-dark") Create New
-  table( class = "centered highlight s8 push-s2")
-    tr(id = "board-list")
-      th #
-      th Title
-    each board in boards
-      tr
-        td= board["title"]
-        td
-          button(id= "index" class = "btn waves-effect waves-dark" value= board["title"]  onclick= "showThread(this.value)" ) View
-          button(id= "index" class = "btn waves-effect waves-dark" value= board["title"]  onclick= "nukeThread(this.value)" ) Nuke
-  script(src= "/js/kanview.js")
+    div(class= "mustardcol centered container row s4")
+        h4(class= "centered") Your Kans
+        button(id="create-new" class= "centered btn waves-effect waves-dark") New Board
+        div(id="creator" class="hide")
+            form(action="createNew" id="createNew" class="col s2")
+                label(for= "name") Board Name
+                input(type= "text" name= "name" id= "name" required)
+                button(class= "btn" type= "submit") create
+        table(class="centered highlight s2")
+            tr(id="board-list")
+                each board in boards
+                    tr
+                    td= board["title"]
+                    td
+                        button(id= "index" class = "btn waves-effect waves-dark" value= board["id"]  onclick= "showBoard(this.value)" ) View
+                        button(id= "index" class = "btn waves-effect waves-dark" value= board["id"]  onclick= "nukeBoard(this.value)" ) Delete
+    script(src="/js/kanview.js")

@@ -1,7 +1,7 @@
 doctype html
 html
     head
-        title= title
+        title= "KanBanAnAMan"
         link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css")
         //script(src="/js/users.js")
         meta(name="viewport" content="width=device-width, initial-scale=1.0")
@@ -11,13 +11,17 @@ html
             nav
                 div(class = "nav-wrapper blue-grey darken-3 ")
                     ul()
-                        li: a(href="/boards/list") Boards
-                        li: a(href="/users/login") Login
-                        li: a(href="/users/register") Register
-                        li: a(href="" id= "logout") Logout
+                        if puguser
+                            li: p(id="username")= puguser
+                        if puguser
+                            li: a(href="/kanban/list" id="boards") Boards
+                        unless puguser
+                            li: a(href="/user/login" id="login") Login
+                        if puguser
+                            li: a(href="/user/logout" id= "logout") Logout
         div(id="viewcont")
             block content
         script(src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js")
     footer
         div()
-            p() kek
+            p()

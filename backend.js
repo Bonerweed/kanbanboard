@@ -46,7 +46,7 @@ kandb.on("error", console.error.bind(console, "DB is DEAD, BAYBEE"));
 app.get("/", (req, res) => {
     res.status(200)
     //res.send("Hello World")
-    res.render("kan", {title: "KabBananaman", messeage: "THIS SUCKS ON ICE"});
+    res.render("mainpage", {title: "KabBananaman", messeage: "THIS SUCKS ON ICE"});
 });
 
 app.use((err, req, res, next) => {

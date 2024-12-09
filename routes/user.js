@@ -49,36 +49,46 @@ router.get("/register", (req, res) => {
 router.post("/login", async (req, res)=>{
     console.log("GOT", req.body, req.body.username, req.body.password);
     const query = await User.find({username: req.body.username}).exec();
-    if (!query) {res.status(403).json({messeage: "no name in db"})}
-    //add salt fetch here
-    console.log(query[0].password, req.body.password);
-    if (req.body.password == query[0].password){
-        console.log("welcome");
-        const payload = {
-            id: query[0]._id,
-            username: query[0].username,
-            admin: query[0].admin
-        };
-        console.log(payload);
-        req.session.user = payload.username;
-        if (payload.admin) {
-            req.session.admin = payload.admin;
-        }
-        res.json({success: true, username: payload.username, admin: payload.admin, redirect:"/"});
-        /*jwt.sign(
-            payload,
-            process.env.SECRET,
-            {
-                expiresIn: 7200
-            },
-            (err, token) => {
-                res.json({success: true, token, username: payload.username, admin: payload.admin, redirect:"/"});
-            }
-        );*/
-    }
-    else {
+    console.log(query, query.length);
+    if (query.length <= 0) {
         res.json({success: false, redirect:"/user"});
     }
+    else {
+        //add salt fetch here
+        console.log(query[0].password, req.body.password);
+        if (req.body.password == query[0].password){
+            console.log("welcome");
+            const payload = {
+                id: query[0]._id,
+                username: query[0].username,
+                admin: query[0].admin
+            };
+            console.log(payload);
+            req.session.user = payload.username;
+            if (payload.admin) {
+                req.session.admin = payload.admin;
+            }
+            res.json({success: true, username: payload.username, admin: payload.admin, redirect:"/kanban/list"});
+            /*jwt.sign(
+                payload,
+                process.env.SECRET,
+                {
+                    expiresIn: 7200
+                },
+                (err, token) => {
+                    res.json({success: true, token, username: payload.username, admin: payload.admin, redirect:"/"});
+                }
+            );*/
+        }
+        else {
+            res.json({success: false, redirect:"/user"});
+        }
+    }
+});
+
+router.get("/logout", (req, res) => {
+    req.session.destroy();
+    res.redirect("/");
 });
   
 //handle registration
